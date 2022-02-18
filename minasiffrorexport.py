@@ -64,7 +64,7 @@ while ok and cnt<maxyears:
 		ok = False
 
 conn.close()
-print(myn)
+
 basey = y - cnt
 y -= 1
 
