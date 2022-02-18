@@ -7,7 +7,7 @@ import os.path, sys
 
 
 toplist = True # False = bottomlist
-maxyears = 4 # Max number of years
+maxyears = 3 # Max number of years
 n = 15 # Number of cases listed +-
 
 
@@ -64,8 +64,9 @@ while ok and cnt<maxyears:
 		ok = False
 
 conn.close()
-
-basey = y - cnt + 1
+print(myn)
+basey = y - cnt
+y -= 1
 
 index = {}
 for m in myn:
@@ -74,35 +75,44 @@ for m in myn:
 		for i in range(len(myn[m])-1, -1, -1):
 			values.append(int(myn[m][i]/myn[m][len(myn[m])-1]*100)-100)
 		index[m] = values
-
-#y = int(date.today().strftime("%Y"))
-
-#lbl =[]
-#for i in range(len(myn[m])):
-#	lbl.append(str((y-len(myn[m]))+i))
 	
 sortedindex = sorted(index, key=lambda x: index[x][len(index[x])-1], reverse = toplist)
-
-#for s in sortedindex[:n]:
-#	print(s, index[s]) 
 
 #  CHART SETUP  =================
 
 chart = chartjs("bar")
 
-lbl, data, clr, cnt = [], [], [], 10
+lbl, data, clr = [], [], []
+cnt, max = 10, 0
 for s in sortedindex[:n]:
-	data.append(index[s][len(index[s])-1])
+	val = index[s][len(index[s])-1]
+	max = val if val > max else max
+	data.append(val)
 	lbl.append(s)
 	cnt += int(89/n)
 	clr.append("#2fa0" + str(cnt))
 
-chart.addDataset(f"Procentuell förändring av årsarbetskraft sedan {basey}", data, clr)
+chart.addDataset(f"Procentuell förändring mellan {basey}-{y}", data, clr)
 chart.addLabels(lbl)
 
 chart.options["plugins"]["legend"] = { "display": False }
 chart.options["tension"] = 0
 
+chart.options["scales"] = {
+		"y": {
+			"grid": {
+				"color": "#444"	
+			},
+			"max": int(str(max+100)[0])*100
+		},
+		"x": {
+			"grid": {
+				"display": False
+			}
+		}
+
+	}
+	
 chart.save(opath, "vaxtverket")
 
 #  SITE SETUP  ===================
@@ -113,7 +123,7 @@ minasiffror.addPage(
 	100,
 	"vaxtverket",
 	"Växtverket",
-	f"Myndigheter växer och krymper över tid. Figuren visar de senaste årens procentuella ökning av årsarbetskrafter hos de myndigheter som växt mest. Utgångspunkten är år {basey} och siffrorna anger den procentuella ökning av antalet årsarbetskrafter sedan dess."
+	f"Myndigheter växer och krymper över tid. Figuren visar den procentuella ökning av årsarbetskrafter hos de myndigheter som växt mest. Utvecklingen avser perioden {basey}-{y}. Siffrorna hämtas automatiskt från ESV."
 	)
 
 minasiffror.save()
