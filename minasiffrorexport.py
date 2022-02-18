@@ -89,9 +89,10 @@ for s in sortedindex[:n]:
 	max = val if val > max else max
 	data.append(val)
 	lbl.append(s)
-	cnt += int(89/n)
-	clr.append("#2fa0" + str(cnt))
-
+	cnt += 7
+	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
+	clr.append("#FFBA" + hexa)
+#2fa0
 chart.addDataset(f"Procentuell förändring mellan {basey}-{y}", data, clr)
 chart.addLabels(lbl)
 
