@@ -95,7 +95,7 @@ try:
 	log = cur.execute(sql).fetchall()
 	conn.close()
 except:
-	print("Error reading database: {db_job}")
+	print(f"Error reading database: {db_job}")
 	sys.exit()
 
 y = int(date.today().strftime("%Y"))	
