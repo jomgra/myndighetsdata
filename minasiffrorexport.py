@@ -91,7 +91,7 @@ for s in sortedindex[:n]:
 	val = index[s][len(index[s])-1]
 	max = val if val > max else max
 	data.append(val)
-	lbl.append([s, f"{myn[s][-1]} åa - {myn[s][0]} åa"])
+	lbl.append([s, f"{myn[s][0]} åa / {myn[s][-1]} åa"])
 	cnt += 7
 	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
 	clr.append("#FFBA" + hexa)
@@ -144,24 +144,27 @@ for l in log:
 				break
 		
 		if m is not None and m[3] is not None and m[3] > 0:
-			ld = l[0][0:10]
+			span = (today-date).days + 7
 			if m[0] in stat:
 				stat[m[0]][0] += l[2]
 			else:
 				stat[m[0]] = [l[2], m[3]]
 
+l = {}
 for m in stat:
 	stat[m].append(round((stat[m][0]/stat[m][1])*100, 2))
+	l[m] = f" {stat[m][0]} pa / {stat[m][1]} an"
+	
 
 sortedstat = sorted(stat, key=lambda x: stat[x][2], reverse = True)
 
 chart = chartjs("bar")
-lbl, data, clr, cnt = [], [], [], 183
+lbl, data, clr, cnt = [], [], [], 185
 
 for s in sortedstat[:n]:
-	lbl.append(s)
+	lbl.append([s, l[s]])
 	data.append(stat[s][2])
-	cnt += 5
+	cnt += 3
 	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
 	clr.append("#288F" + hexa)
 
@@ -199,13 +202,13 @@ minasiffror.addPage(
 	100,
 	"vaxtverket",
 	"Växtverket",
-	f"Myndigheter växer och krymper över tid. Figuren visar den procentuella ökning av årsarbetskrafter hos de myndigheter som växt mest. Utvecklingen avser perioden {basey}-{y}. Siffrorna hämtas automatiskt från ESV."
+	f"Myndigheterna vuxit mest de senadte åren. Figuren visar den procentuella ökning av årsarbetskrafter (åa) hos de myndigheter som vuxit mest. Utvecklingen avser perioden {basey}-{y}. Siffrorna hämtas automatiskt från ESV."
 	)
 	
 minasiffror.addPage(
 	105,
 	"rekryterarna",
 	"Rekryterarna",
-	f"Myndigheterna som rekryterar mest i   förhållande till sin storlek. Figuren visar myndighetens platsannonser de senaste {jobstatdays} dagarna i förhållande till antalet andtällda.  Siffrorna hämtas automatiskt från ESV och Arbetsförmedlingen."
+	f"Myndigheterna som rekryterar mest i   förhållande till sin storlek. Figuren visar myndighetens platsannonser (pa) de senaste {span} dagarna i förhållande till antalet andtällda (an).  Siffrorna hämtas automatiskt från ESV och Arbetsförmedlingen."
 	)
 minasiffror.save()
