@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sqlite3
-from datetime import date
+from datetime import date, datetime
 from webexport import chartjs, site
 import os.path, sys
 
@@ -9,6 +9,8 @@ import os.path, sys
 toplist = True # False = bottomlist
 maxyears = 3 # Max number of years
 n = 15 # Number of cases listed +-
+
+jobstatdays = 100 # Num of days
 
 
 #  SET OUTPUT PATH =============
@@ -23,11 +25,13 @@ else:
 
 f = path + '/myndata.db'
 
+db_job = path + "/jobdata.db"
+
 if not os.path.isfile(f):
 	print("No database")
 	sys.exit()
 
-#  GENERATE DATA ===============
+#  GENERATE DATA 1 ===============
 
 
 def create_connection(db_file):
@@ -77,7 +81,7 @@ for m in myn:
 	
 sortedindex = sorted(index, key=lambda x: index[x][len(index[x])-1], reverse = toplist)
 
-#  CHART SETUP  =================
+#  CHART SETUP 1 =================
 
 chart = chartjs("bar")
 
@@ -115,9 +119,81 @@ chart.options["scales"] = {
 	
 chart.save(opath, "vaxtverket")
 
+#  GENERATE DATA 2 ===============
+
+try:
+	conn = create_connection(db_job)
+	cur = conn.cursor()
+	sql = f"SELECT * FROM 'myndighetsjobb' ORDER BY datum ASC"
+	log = cur.execute(sql).fetchall()
+	conn.close()
+except:
+	print(f"Error reading database: {db_job}")
+	sys.exit()
+	
+m = None
+today = date.today()
+stat = {}
+
+for l in log:
+	date = datetime.strptime(l[0][0:10],"%Y-%m-%d").date()
+	if (today-date).days <= jobstatdays:
+		for e in d:
+			if e[1].replace("-","").strip() == l[1]:
+				m = e
+				break
+		
+		if m is not None and m[3] is not None and m[3] > 0:
+			ld = l[0][0:10]
+			if m[0] in stat:
+				stat[m[0]][0] += l[2]
+			else:
+				stat[m[0]] = [l[2], m[3]]
+
+for m in stat:
+	stat[m].append(round((stat[m][0]/stat[m][1])*100, 2))
+
+sortedstat = sorted(stat, key=lambda x: stat[x][2], reverse = True)
+
+chart = chartjs("bar")
+lbl, data, clr, cnt = [], [], [], 183
+
+for s in sortedstat[:n]:
+	lbl.append(s)
+	data.append(stat[s][2])
+	cnt += 5
+	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
+	clr.append("#288F" + hexa)
+
+
+chart.addDataset(f"", data, clr)
+chart.addLabels(lbl)
+
+chart.options["plugins"]["legend"] = { "display": False }
+chart.options["tension"] = 0
+
+chart.options["scales"] = {
+		"y": {
+			"grid": {
+				"color": "#444"	
+			},
+			"max": data[0]+25
+		},
+		"x": {
+			"grid": {
+				"display": False
+			}
+		}
+
+	}
+	
+chart.save(opath, "rekryterarna")
+
 #  SITE SETUP  ===================
 
 minasiffror = site(opath)
+
+print(log[0][0][0:10])
 
 minasiffror.addPage(
 	100,
@@ -125,5 +201,11 @@ minasiffror.addPage(
 	"Växtverket",
 	f"Myndigheter växer och krymper över tid. Figuren visar den procentuella ökning av årsarbetskrafter hos de myndigheter som växt mest. Utvecklingen avser perioden {basey}-{y}. Siffrorna hämtas automatiskt från ESV."
 	)
-
+	
+minasiffror.addPage(
+	105,
+	"rekryterarna",
+	"Rekryterarna",
+	f"Myndigheterna som rekryterar mest i   förhållande till sin storlek. Figuren visar myndighetens platsannonser de senaste {jobstatdays} dagarna i förhållande till antalet andtällda.  Siffrorna hämtas automatiskt från ESV och Arbetsförmedlingen."
+	)
 minasiffror.save()
