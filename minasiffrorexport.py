@@ -21,7 +21,6 @@ else:
 	opath = path + "/../minasiffror/html"
 #	opath = path + "/"
 
-
 f = path + '/myndata.db'
 
 if not os.path.isfile(f):
@@ -88,7 +87,7 @@ for s in sortedindex[:n]:
 	val = index[s][len(index[s])-1]
 	max = val if val > max else max
 	data.append(val)
-	lbl.append(s)
+	lbl.append([s, f"{myn[s][-1]} åa - {myn[s][0]} åa"])
 	cnt += 7
 	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
 	clr.append("#FFBA" + hexa)

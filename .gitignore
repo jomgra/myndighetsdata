@@ -1,3 +1,4 @@
 /cache/**
 *.cfg
 *.chart
+/default.ini
