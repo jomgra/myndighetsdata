@@ -132,24 +132,28 @@ except:
 	sys.exit()
 	
 m = None
-today = date.today()
+today, fromdate = date.today(), None
 stat = {}
+
 
 for l in log:
 	date = datetime.strptime(l[0][0:10],"%Y-%m-%d").date()
 	if (today-date).days <= jobstatdays:
+		if fromdate is None:
+			fromdate = date 
 		for e in d:
 			if e[1].replace("-","").strip() == l[1]:
 				m = e
 				break
 		
 		if m is not None and m[3] is not None and m[3] > 0:
-			span = (today-date).days + 7
 			if m[0] in stat:
 				stat[m[0]][0] += l[2]
 			else:
 				stat[m[0]] = [l[2], m[3]]
 
+span = (today-fromdate).days + 7
+#print(f"Period: last {span} days")
 l = {}
 for m in stat:
 	stat[m].append(round((stat[m][0]/stat[m][1])*100, 2))
@@ -196,10 +200,8 @@ chart.save(opath, "rekryterarna")
 
 minasiffror = site(opath)
 
-print(log[0][0][0:10])
-
 minasiffror.addPage(
-	100,
+	102,
 	"vaxtverket",
 	"Växtverket",
 	f"Myndigheterna vuxit mest de senadte åren. Figuren visar den procentuella ökning av årsarbetskrafter (åa) hos de myndigheter som vuxit mest. Utvecklingen avser perioden {basey}-{y}. Siffrorna hämtas automatiskt från ESV."
