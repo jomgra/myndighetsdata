@@ -110,6 +110,9 @@ chart.options["scales"] = {
 			"max": int(str(max+100)[0])*100
 		},
 		"x": {
+			"ticks": {
+				"color": "#ccc"
+			},
 			"grid": {
 				"display": False
 			}
@@ -188,8 +191,8 @@ chart.options["scales"] = {
 			"max": data[0]+25
 		},
 		"x": {
-			"grid": {
-				"display": False
+			"ticks": {
+				"color": "#ccc"
 			}
 		}
 
