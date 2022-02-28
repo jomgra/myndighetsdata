@@ -132,13 +132,14 @@ except:
 	sys.exit()
 	
 m = None
-today, fromdate = date.today(), None
+today, fromdate, todate = date.today(), None, None
 stat = {}
 
 
 for l in log:
 	date = datetime.strptime(l[0][0:10],"%Y-%m-%d").date()
 	if (today-date).days <= jobstatdays:
+		todate = date
 		if fromdate is None:
 			fromdate = date 
 		for e in d:
@@ -152,7 +153,7 @@ for l in log:
 			else:
 				stat[m[0]] = [l[2], m[3]]
 
-span = (today-fromdate).days + 7
+span = (todate-fromdate).days + 7
 #print(f"Period: last {span} days")
 l = {}
 for m in stat:
@@ -211,6 +212,6 @@ minasiffror.addPage(
 	105,
 	"rekryterarna",
 	"Rekryterarna",
-	f"Myndigheterna som rekryterar mest i   förhållande till sin storlek. Figuren visar myndighetens platsannonser (pa) de senaste {span} dagarna i förhållande till antalet andtällda (an).  Siffrorna hämtas automatiskt från ESV och Arbetsförmedlingen."
+	f"Myndigheterna som rekryterar mest i   förhållande till sin storlek. Figuren visar myndighetens antal platsannonser (pa) de senaste {span} dagarna i förhållande till antalet anställda (an). Siffrorna hämtas automatiskt från ESV och Arbetsförmedlingen."
 	)
 minasiffror.save()
