@@ -96,7 +96,7 @@ for s in sortedindex[:n]:
 	hexa = "00"[0:2-len(hex(cnt)[2:])] + hex(cnt)[2:]
 	clr.append("#FFBA" + hexa)
 #2fa0
-chart.addDataset(f"Procentuell förändring mellan {basey}-{y}", data, clr)
+chart.addDataset(f"Procentuell ökning mellan {basey}-{y}", data, clr)
 chart.addLabels(lbl)
 
 chart.options["plugins"]["legend"] = { "display": False }
