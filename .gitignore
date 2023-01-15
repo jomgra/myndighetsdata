@@ -2,3 +2,4 @@
 *.cfg
 *.chart
 /default.ini
+/ny version/gsheets.json
